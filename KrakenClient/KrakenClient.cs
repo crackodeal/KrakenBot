@@ -116,6 +116,8 @@ namespace KrakenClient
             Int64 nonce = DateTime.Now.Ticks;
             props =  "nonce=" + nonce + props;
 
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
 
             string path = string.Format("/{0}/private/{1}", _version, a_sMethod);
             string address = _url + path;

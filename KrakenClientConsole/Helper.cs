@@ -16,7 +16,8 @@ namespace KrakenClientConsole
         private static KrakenClient.KrakenClient client = new KrakenClient.KrakenClient();
         private static Broker broker = new Broker();
 
-        private const decimal fxRate = (decimal)1.2275;
+        private static decimal fxRateAsk = (decimal)1.079;
+        private static decimal fxRateBid = (decimal)1.079;
 
         private static decimal commission = (decimal)0.26;
 
@@ -63,9 +64,9 @@ namespace KrakenClientConsole
             LogEventInfo theEvent = new LogEventInfo(LogLevel.Debug, "KrakenAPI", message);
             nLogger.Log(theEvent);
         }
-        private static void LogAudit(decimal maxEur,decimal maxUsd)
+        private static void LogAudit(decimal maxEur, decimal maxUsd)
         {
-            System.IO.File.AppendAllText(@"Spread.csv",string.Format("{0},{1:0.0000},{2:0.0000}\n", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), maxEur, maxUsd));
+            System.IO.File.AppendAllText(@"Spread.csv", string.Format("{0},{1:0.0000},{2:0.0000}\n", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), maxEur, maxUsd));
         }
 
         private static void SetSettings()
@@ -91,6 +92,7 @@ namespace KrakenClientConsole
             var objBalances = (Dictionary<string, object>)result;
             balanceEur = Convert.ToDecimal(objBalances["ZEUR"]);
             balanceUsd = Convert.ToDecimal(objBalances["ZUSD"]);
+            //fxRate = 
 
             var totalEur = GetBalanceAsset("ZEUR");
 
@@ -180,7 +182,7 @@ namespace KrakenClientConsole
             var jsSerializer = new JavaScriptSerializer();
             var result = jsSerializer.DeserializeObject(balance["result"].ToString());
             var objBalances = (Dictionary<string, object>)result;
-            var balanceAsset = Convert.ToDecimal(objBalances["tb"]);
+            var balanceAsset = Convert.ToDecimal(objBalances["eb"]);
             return balanceAsset;
         }
 
@@ -193,21 +195,28 @@ namespace KrakenClientConsole
             var listPairs = new List<string>();
             foreach (var crypto in listCrypto)
             {
-                var usdPair = string.Format("X{0}ZUSD", crypto);
-                var eurPair = string.Format("X{0}ZEUR", crypto);
+                var usdPair = string.Format("{0}USD", crypto);
+                var eurPair = string.Format("{0}EUR", crypto);
 
                 switch (crypto)
                 {
-                    case "DASH":
-                    case "BCH":
-                        usdPair = string.Format("{0}USD", crypto);
-                        eurPair = string.Format("{0}EUR", crypto);
+                    case "XBT":
+                    case "LTC":
+                    case "XRP":
+                    case "XLM":
+                    case "ETH":
+                    case "ETC":
+                    case "ZEC":
+                        usdPair = string.Format("X{0}ZUSD", crypto);
+                        eurPair = string.Format("X{0}ZEUR", crypto);
                         break;
                 }
 
                 listPairs.Add(usdPair);
                 listPairs.Add(eurPair);
             }
+
+            listPairs.Add("ZEURZUSD");
 
             while (true)
             {
@@ -230,17 +239,27 @@ namespace KrakenClientConsole
                     var result = jsSerializer.DeserializeObject(ticker["result"].ToString());
                     var obj2 = (Dictionary<string, object>)result;
 
+                    var objFxRate = (Dictionary<string, object>)obj2["ZEURZUSD"];
+
+                    fxRateAsk = Convert.ToDecimal(((object[])objFxRate["a"])[0].ToString());
+                    fxRateBid = Convert.ToDecimal(((object[])objFxRate["b"])[0].ToString());
+
                     foreach (var crypto in listCrypto)
                     {
-                        var usdPair = string.Format("X{0}ZUSD", crypto);
-                        var eurPair = string.Format("X{0}ZEUR", crypto);
+                        var usdPair = string.Format("{0}USD", crypto);
+                        var eurPair = string.Format("{0}EUR", crypto);
 
                         switch (crypto)
                         {
-                            case "DASH":
-                            case "BCH":
-                                usdPair = string.Format("{0}USD", crypto);
-                                eurPair = string.Format("{0}EUR", crypto);
+                            case "XBT":
+                            case "LTC":
+                            case "XRP":
+                            case "XLM":
+                            case "ETH":
+                            case "ETC":
+                            case "ZEC":
+                                usdPair = string.Format("X{0}ZUSD", crypto);
+                                eurPair = string.Format("X{0}ZEUR", crypto);
                                 break;
                         }
 
@@ -254,8 +273,8 @@ namespace KrakenClientConsole
                         var eurAsk = Convert.ToDecimal(((object[])obj3["a"])[0].ToString());
                         var eurBid = Convert.ToDecimal(((object[])obj3["b"])[0].ToString());
 
-                        var eur2Usd = Math.Round((usdBid / fxRate - eurAsk) * 100 / eurAsk, 2);
-                        var usd2Eur = Math.Round((eurBid * fxRate - usdAsk) * 100 / usdAsk, 2);
+                        var eur2Usd = Math.Round((usdBid / fxRateBid - eurAsk) * 100 / eurAsk, 2);
+                        var usd2Eur = Math.Round((eurBid * fxRateAsk - usdAsk) * 100 / usdAsk, 2);
 
                         if (eur2Usd > maxEur)
                         {
@@ -280,7 +299,7 @@ namespace KrakenClientConsole
                     LogInfo("MaxEUR: {0}/{4} ({2}) MaxUSD: {1}/{5} ({3})", maxEur - commission, maxUsd - commission, pairFoundEur, pairFoundUsd, tresholdEur, tresholdUsd);
                     LogAudit(maxEur, maxUsd);
 
-                    if (maxUsd - commission > tresholdUsd)
+                    if (maxUsd - commission >= tresholdUsd)
                     {
                         LogAlert("Best USD path detected {0} at {1}%, balance USD = {2}, try volume = {3}",
                             pairFoundUsd, maxUsd, balanceUsd, volumeUsd);
@@ -303,7 +322,7 @@ namespace KrakenClientConsole
                             LogInfo("Amount {0} insufficient, no orders", usdAmount);
                         }
                     }
-                    if (maxEur - commission > tresholdEur)
+                    if (maxEur - commission >= tresholdEur)
                     {
                         LogAlert("Best EUR path detected {0} at {1}%, balance EUR = {2}, try volume = {3}", pairFoundEur, maxEur, balanceEur, volumeEur);
                         if (eurAmount >= krakenLimitAmount)

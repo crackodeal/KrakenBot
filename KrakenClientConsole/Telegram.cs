@@ -34,7 +34,7 @@ namespace KrakenClientConsole
             // Authentication
             // Uncomment once you need to do so
             //var hash = await client.SendCodeRequestAsync(userNumber);
-            //var code = "66063"; // you can change code in debugger
+            //var code = "23425"; // you can change code in debugger
             //var user = await client.MakeAuthAsync(userNumber, hash, code);
 
 
