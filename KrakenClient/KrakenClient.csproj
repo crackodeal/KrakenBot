@@ -57,8 +57,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\Broker.cs" />
     <Compile Include="KrakenClient.cs" />
+    <Compile Include="Models\CancelOrderResult.cs" />
+    <Compile Include="Models\GetOrdersResult.cs" />
     <Compile Include="Models\KrakenOrder.cs" />
+    <Compile Include="Models\PlaceOrderResult.cs" />
+    <Compile Include="Models\RefreshOrderResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

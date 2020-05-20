@@ -1,6 +1,5 @@
 ﻿using ExcelDna.Integration;
 using ExcelDna.Registration;
-using KrakenClientConsole;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

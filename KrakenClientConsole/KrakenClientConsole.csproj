@@ -90,13 +90,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper.cs" />
-    <Compile Include="Helpers\Broker.cs" />
-    <Compile Include="Models\CancelOrderResult.cs" />
-    <Compile Include="Models\GetOrdersResult.cs" />
-    <Compile Include="Models\PlaceOrderResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Models\RefreshOrderResult.cs" />
     <Compile Include="Telegram.cs" />
   </ItemGroup>
   <ItemGroup>

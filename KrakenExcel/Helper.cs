@@ -1,18 +1,13 @@
-﻿using System;
+﻿using KrakenClient;
+using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
-using KrakenClient;
-using KrakenClientConsole;
-using NLog;
 
 namespace KrakenExcel
 {
     public class Helper
     {
-        private static NLog.Logger nLogger = LogManager.GetCurrentClassLogger();
         private static KrakenClient.KrakenClient client = new KrakenClient.KrakenClient();
         private static Broker broker = new Broker();
 
