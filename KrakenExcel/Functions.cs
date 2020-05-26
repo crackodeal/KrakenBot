@@ -1,6 +1,7 @@
 ﻿using ExcelDna.Integration;
 using ExcelDna.Registration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -47,7 +48,20 @@ namespace KrakenExcel
         {
             return await Helper.GetTicker(name, "b");
         }
-
-
+        [ExcelFunction(Name = "Kraken.GetTradesHistory", Description = "Kraken API get trades for dates")]
+        public static async Task<object[,]> GetTradesHistory(DateTime fromDate, DateTime toDate)
+        {
+            return await Helper.GetTradesHistory(fromDate, toDate);
+        }
+        [ExcelFunction(Name = "Kraken.GetBalances", Description = "Kraken API get balances")]
+        public static async Task<object[,]> GetBalances()
+        {
+            return await Helper.GetBalances();
+        }
+        [ExcelFunction(Name = "Kraken.GetPrices", Description = "Kraken API get prices")]
+        public static async Task<object[,]> GetPrices(object[] range)
+        {
+            return await Helper.GetPrices(range);
+        }
     }
 }
