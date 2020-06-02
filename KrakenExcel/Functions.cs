@@ -15,10 +15,7 @@ namespace KrakenExcel
                            .ProcessAsyncRegistrations(nativeAsyncIfAvailable: false)
                            .RegisterFunctions();
         }
-        public void AutoClose()
-        {
-        }
-
+        public void AutoClose() { }
     }
     public static class Functions
     {
@@ -37,11 +34,10 @@ namespace KrakenExcel
         {
             return await Helper.GetTradeBalance(name, "eb");
         }
-
         [ExcelFunction(Name = "Kraken.GetTickerAsk", Description = "Kraken API get ticker ask price", ExplicitRegistration = true)]
-        public static async Task<decimal> GetTickerAsk([ExcelArgument(Name = "Asset")] string name)
+        public static async Task<decimal> GetTickerAsk([ExcelArgument(Name = "Asset")] string asset)
         {
-            return await Helper.GetTicker(name.ToString(), "a");
+            return await Helper.GetTicker(asset.ToString(), "a");
         }
         [ExcelFunction(Name = "Kraken.GetTickerBid", Description = "Kraken API get ticker bid price")]
         public static async Task<decimal> GetTickerBid(string name)
@@ -62,6 +58,11 @@ namespace KrakenExcel
         public static async Task<object[,]> GetPrices(object[] range)
         {
             return await Helper.GetPrices(range);
+        }
+        [ExcelFunction(Name = "Kraken.GetOpenOrders", Description = "Kraken API get open orders")]
+        public static async Task<object[,]> GetOpenOrders()
+        {
+            return await Helper.GetOpenOrders();
         }
     }
 }

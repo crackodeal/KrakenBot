@@ -1,17 +1,14 @@
-﻿using KrakenClient;
+﻿using Jayrock.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 
 namespace KrakenExcel
 {
     public class Helper
     {
         private static KrakenClient.KrakenClient client = new KrakenClient.KrakenClient();
-        private static Broker broker = new Broker();
 
         #region For Excel
         public async static Task<decimal> GetBalance(string asset)
@@ -19,11 +16,9 @@ namespace KrakenExcel
             decimal balanceAsset = 0;
             await Task.Run(() =>
             {
-                var balance = client.GetBalance();
-                var jsSerializer = new JavaScriptSerializer();
-                var result = jsSerializer.DeserializeObject(balance["result"].ToString());
-                var objBalances = (Dictionary<string, object>)result;
-                balanceAsset = Convert.ToDecimal(objBalances[asset]);
+                var response = client.GetBalance();
+                JsonObject balances = (JsonObject)response["result"];
+                balanceAsset = Convert.ToDecimal(balances[asset]);
             });
             return balanceAsset;
         }
@@ -32,17 +27,14 @@ namespace KrakenExcel
             object[,] excelBalances = null;
             await Task.Run(() =>
             {
-                var jsSerializer = new JavaScriptSerializer();
                 var response = client.GetBalance();
-                var result = jsSerializer.DeserializeObject(response["result"].ToString());
-                var balances = (Dictionary<string, object>)result;
-
+                JsonObject balances = (JsonObject)response["result"];
                 // Pack an array for Excel
                 excelBalances = new object[balances.Count, 2];
                 var i = 0;
                 foreach (var balance in balances)
                 {
-                    excelBalances[i, 0] = balance.Key;
+                    excelBalances[i, 0] = balance.Name;
                     excelBalances[i, 1] = Convert.ToDecimal(balance.Value);
                     i++;
                 }
@@ -54,11 +46,9 @@ namespace KrakenExcel
             decimal balanceAsset = 0;
             await Task.Run(() =>
             {
-                var balance = client.GetTradeBalance(null, asset);
-                var jsSerializer = new JavaScriptSerializer();
-                var result = jsSerializer.DeserializeObject(balance["result"].ToString());
-                var objBalances = (Dictionary<string, object>)result;
-                balanceAsset = Convert.ToDecimal(objBalances[value]);
+                var response = client.GetTradeBalance(null, asset);
+                JsonObject balances = (JsonObject)response["result"];
+                balanceAsset = Convert.ToDecimal(balances[value]);
             });
             return balanceAsset;
         }
@@ -67,12 +57,9 @@ namespace KrakenExcel
             decimal price = 0;
             await Task.Run(() =>
             {
-                var ticker = client.GetTicker(new List<string> { pair });
-                var jsSerializer = new JavaScriptSerializer();
-                var result = jsSerializer.DeserializeObject(ticker["result"].ToString());
-                var objPrices = (Dictionary<string, object>)result;
-                var objPrice = (Dictionary<string, object>)objPrices[pair];
-                price = Convert.ToDecimal(((object[])objPrice[value])[0].ToString());
+                var response = client.GetTicker(new List<string> { pair });
+                var prices = (JsonObject)response["result"];
+                price = Convert.ToDecimal(((object[])((JsonObject)prices[pair])[value])[0].ToString());
             });
             return price;
         }
@@ -81,18 +68,17 @@ namespace KrakenExcel
             object[,] excelPrices = null;
             await Task.Run(() =>
             {
-                var ticker = client.GetTicker( pair.OfType<string>().ToList() );
-                var jsSerializer = new JavaScriptSerializer();
-                var prices = (Dictionary<string, object>)jsSerializer.DeserializeObject(ticker["result"].ToString());
-
+                var response = client.GetTicker(pair.OfType<string>().ToList());
+                var prices = (JsonObject)response["result"];
                 // Pack an array for Excel
                 excelPrices = new object[prices.Count, 3];
                 var i = 0;
                 foreach (var price in prices)
                 {
-                    excelPrices[i, 0] = price.Key;
-                    excelPrices[i, 1] = Convert.ToDecimal(((object[])((Dictionary<string, object>)price.Value)["a"])[0]);
-                    excelPrices[i, 2] = Convert.ToDecimal(((object[])((Dictionary<string, object>)price.Value)["b"])[0]);
+                    excelPrices[i, 0] = price.Name;
+                    var values = (JsonObject)price.Value;
+                    excelPrices[i, 1] = Convert.ToDecimal(((JsonArray)values["a"])[0]);
+                    excelPrices[i, 2] = Convert.ToDecimal(((JsonArray)values["b"])[0]);
                     i++;
                 }
             });
@@ -105,27 +91,52 @@ namespace KrakenExcel
             {
                 long start = Convert.ToInt64(fromDate.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
                 long end = Convert.ToInt64(toDate.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
-                var tradesHistory = client.GetTradesHistory("", "all", false, start.ToString(), end.ToString());
-                var jsSerializer = new JavaScriptSerializer();
-                var result = (Dictionary<string, object>)jsSerializer.DeserializeObject(tradesHistory["result"].ToString());
-                var trades = (Dictionary<string, object>)result["trades"];
+                var response = client.GetTradesHistory("", "all", false, start.ToString(), end.ToString());
+                var result = (JsonObject)response["result"];
+                var trades = (JsonObject)result["trades"];
 
                 // Pack an array for Excel
                 excelTrades = new object[trades.Count, 7];
                 var i = 0;
                 foreach (var trade in trades)
                 {
-                    excelTrades[i, 0] = ((Dictionary<string, object>)trade.Value)["pair"];
-                    excelTrades[i, 1] = (new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(Convert.ToInt64(((Dictionary<string, object>)trade.Value)["time"]))).ToString("dd/MM/yyyy hh:mm:ss");
-                    excelTrades[i, 2] = ((Dictionary<string, object>)trade.Value)["type"];
-                    excelTrades[i, 3] = Convert.ToDecimal(((Dictionary<string, object>)trade.Value)["vol"]);
-                    excelTrades[i, 4] = Convert.ToDecimal(((Dictionary<string, object>)trade.Value)["price"]);
-                    excelTrades[i, 5] = Convert.ToDecimal(((Dictionary<string, object>)trade.Value)["cost"]);
-                    excelTrades[i, 6] = Convert.ToDecimal(((Dictionary<string, object>)trade.Value)["fee"]);
+                    excelTrades[i, 0] = ((JsonObject)trade.Value)["pair"];
+                    excelTrades[i, 1] = (new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((int)Convert.ToDecimal(((JsonObject)trade.Value)["time"]))).ToString("dd/MM/yyyy hh:mm:ss");
+                    excelTrades[i, 2] = ((JsonObject)trade.Value)["type"];
+                    excelTrades[i, 3] = Convert.ToDecimal(((JsonObject)trade.Value)["vol"]);
+                    excelTrades[i, 4] = Convert.ToDecimal(((JsonObject)trade.Value)["price"]);
+                    excelTrades[i, 5] = Convert.ToDecimal(((JsonObject)trade.Value)["cost"]);
+                    excelTrades[i, 6] = Convert.ToDecimal(((JsonObject)trade.Value)["fee"]);
                     i++;
                 }
             });
             return excelTrades;
+        }
+
+        public async static Task<object[,]> GetOpenOrders()
+        {
+            object[,] excelOrders = null;
+            await Task.Run(() =>
+            {
+                var response = client.GetOpenOrders();
+                var result = (JsonObject)response["result"];
+                var orders = (JsonObject)result["open"];
+                // Pack an array for Excel
+                excelOrders = new object[orders.Count, 6];
+                var i = 0;
+                foreach (var order in orders)
+                {
+                    var descr = (JsonObject)((JsonObject)order.Value)["descr"];
+                    excelOrders[i, 0] = order.Name;
+                    excelOrders[i, 1] = descr["pair"];
+                    excelOrders[i, 2] = descr["type"];
+                    excelOrders[i, 3] = Convert.ToDecimal(((JsonObject)order.Value)["vol"]);
+                    excelOrders[i, 4] = Convert.ToDecimal(descr["price"]);
+                    excelOrders[i, 5] = descr["order"];
+                    i++;
+                }
+            });
+            return excelOrders;
         }
         #endregion
     }
