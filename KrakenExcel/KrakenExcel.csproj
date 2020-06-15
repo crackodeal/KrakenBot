@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="documents\Book1.xlsx" />
     <None Include="KrakenExcel-AddIn.dna" />
     <None Include="packages.config" />
     <None Include="Properties\ExcelDna.Build.props" />
