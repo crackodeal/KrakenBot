@@ -1,9 +1,6 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\KrakenClient",
-    "\\KrakenClientConsole"
+    ""
   ],
-  "SelectedNode": "\\KrakenClientConsole\\NLog.config",
   "PreviewInSolutionExplorer": false
 }
