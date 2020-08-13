@@ -11,6 +11,38 @@ namespace KrakenExcel
         private static KrakenClient.KrakenClient client = new KrakenClient.KrakenClient();
 
         #region For Excel
+        public static string CreateSellOrder(string pair, decimal volume, decimal price)
+        {
+            var addOrderRes = client.AddOrder(pair, "sell", "limit", volume, price, null, @"none", "", "", "", "", "", false, null);
+            var objError = (JsonArray)addOrderRes["error"];
+            if (objError.Count > 0) return objError[0].ToString();
+            var objOrder = (JsonObject)addOrderRes["result"];
+            return ((JsonArray)objOrder["txid"])[0].ToString();
+        }
+        public static string CreateSellOrderMarket(string pair, decimal volume)
+        {
+            var addOrderRes = client.AddOrder(pair, "sell", "market", volume, null, null, @"none", "", "", "", "", "", false, null);
+            var objError = (JsonArray)addOrderRes["error"];
+            if (objError.Count > 0) return objError[0].ToString();
+            var objOrder = (JsonObject)addOrderRes["result"];
+            return ((JsonArray)objOrder["txid"])[0].ToString();
+        }
+        public static string CreateBuyOrder(string pair, decimal volume, decimal price)
+        {
+            var addOrderRes = client.AddOrder(pair, "buy", "limit", volume, price, null, @"none", "", "", "", "", "", false, null);
+            var objError = (JsonArray)addOrderRes["error"];
+            if (objError.Count > 0) return objError[0].ToString();
+            var objOrder = (JsonObject)addOrderRes["result"];
+            return ((JsonArray)objOrder["txid"])[0].ToString();
+        }
+        public static string CloseOrder(string key)
+        {
+            var cancelOrder = client.CancelOrder(key);
+            var objError = (JsonArray)cancelOrder["error"];
+            if (objError.Count > 0) return objError[0].ToString();
+            return "Done";
+        }
+
         public async static Task<decimal> GetBalance(string asset)
         {
             decimal balanceAsset = 0;

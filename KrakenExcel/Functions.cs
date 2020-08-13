@@ -64,5 +64,25 @@ namespace KrakenExcel
         {
             return await Helper.GetOpenOrders();
         }
+        [ExcelFunction(Name = "Kraken.CreateSellOrder", Description = "Kraken API create sell order")]
+        public static string CreateSellOrder(string pair, decimal volume, decimal price)
+        {
+            return Helper.CreateSellOrder(pair, volume, price);
+        }
+        [ExcelFunction(Name = "Kraken.CreateSellOrderMarket", Description = "Kraken API create sell order market")]
+        public static string CreateSellOrderMarket(string pair, decimal volume)
+        {
+            return Helper.CreateSellOrderMarket(pair, volume);
+        }
+        [ExcelFunction(Name = "Kraken.CreateBuyOrder", Description = "Kraken API create buy order")]
+        public static string CreateBuyOrder(string pair, decimal volume, decimal price)
+        {
+            return Helper.CreateBuyOrder(pair, volume, price);
+        }
+        [ExcelFunction(Name = "Kraken.CloseOrder", Description = "Kraken API close order")]
+        public static string CloseOrder(string key)
+        {
+            return Helper.CloseOrder(key);
+        }
     }
 }
