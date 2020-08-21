@@ -27,6 +27,14 @@ namespace KrakenExcel
             var objOrder = (JsonObject)addOrderRes["result"];
             return ((JsonArray)objOrder["txid"])[0].ToString();
         }
+        public static string CreateSellOrderStop(string pair, decimal volume, decimal price)
+        {
+            var addOrderRes = client.AddOrder(pair, "sell", "stop-loss", volume, price, null, @"none", "", "", "", "", "", false, null);
+            var objError = (JsonArray)addOrderRes["error"];
+            if (objError.Count > 0) return objError[0].ToString();
+            var objOrder = (JsonObject)addOrderRes["result"];
+            return ((JsonArray)objOrder["txid"])[0].ToString();
+        }
         public static string CreateBuyOrder(string pair, decimal volume, decimal price)
         {
             var addOrderRes = client.AddOrder(pair, "buy", "limit", volume, price, null, @"none", "", "", "", "", "", false, null);
