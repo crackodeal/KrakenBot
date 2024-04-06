@@ -8,10 +8,10 @@ It used arbitrage trading. Simply saying it used a lag in pricing of crypto curr
 buying crypto by EUR and quickly selling to USD gave me a little profit. With a time I found breaches in my approach
 and exited the market on stop loss condition. However this bot served well as an educational project.
 
-2. In enables Buy/Sell orders from Excel in year 2020. Thus trading is done by a decision but sell/buy orders initiated straight
-from my Excel crypto portfolio, synchronised with Kraken.com
+2. In enables Buy/Sell orders from Excel in year 2020. Thus trading is done by a decision but sell/buy orders initiated 
+straight from my Excel crypto portfolio, synchronised with Kraken.com
 
 
 ABANDONED project. 
-No commits nor testing since year 2020.
-
+No commits, builds or testing since year 2020.
+Do not bother using my Kraken API keys. They have already been revoked.
