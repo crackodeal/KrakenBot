@@ -1,17 +1,19 @@
-A simple crypto currency trading bot and Excel interface.
-Developed for self educational purpose. Introduction to crypto currency and trading world.
+#A Simple Cryptocurrency Trading Bot and Excel Interface
+Developed for educational purposes, this project served as my introduction to the world of cryptocurrency and trading.
 
-It used to have two main functions:
+#Main Functions
+1. Command Line Trading (2018):
 
-1. In year 2018 it was a command line process which automatically traded crypto currencies in my Kraken.com portfolio. 
-It used arbitrage trading. Simply saying it used a lag in pricing of crypto currency to EUR and USD. For example,
-buying crypto by EUR and quickly selling to USD gave me a little profit. With a time I found breaches in my approach
-and exited the market on stop loss condition. However this bot served well as an educational project.
+- The bot was a command-line process that automatically traded cryptocurrencies in my Kraken.com portfolio.
+- It utilized arbitrage trading, capitalizing on price discrepancies between cryptocurrency values in EUR and USD. For example, buying cryptocurrency with EUR and quickly selling it for USD generated small profits.
+- Over time, I identified flaws in my approach and exited the market based on a stop-loss condition. Despite this, the bot served well as an educational project.
 
-2. In enables Buy/Sell orders from Excel in year 2020. Thus trading is done by a decision but sell/buy orders initiated 
-straight from my Excel crypto portfolio, synchronised with Kraken.com
+2. Excel Integration (2020):
 
+- The bot enabled Buy/Sell orders directly from Excel.
+- Trading decisions were made manually, but buy/sell orders were executed directly from my Excel crypto portfolio, synchronized with Kraken.com.
 
-ABANDONED project. 
-No commits, builds or testing since year 2020.
-Do not bother using my Kraken API keys. They have already been revoked.
+#Project Status
+ABANDONED:
+No commits, builds, or testing have been done since 2020.
+Do not attempt to use my Kraken API keys, as they have already been revoked.
